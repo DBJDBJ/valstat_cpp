@@ -1,14 +1,11 @@
-# Valstat Return Protocol
+# Valstat Return Protocol C++ Definition
 Every call has a response&trade;
-
-## C++ Definition
 
 > Together a protocol and its implementation are assembling an behavior pattern.
 
+**The C++ Code aka Implementation**
 
-**The C++ Code**
-
-Is in separate repository [HERE](https://github.com/DBJDBJ/metastate_code).
+Is in separate repository [HERE](https://github.com/DBJDBJ/valstat_cpp_code).
 
 ### What is in here
 
