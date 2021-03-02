@@ -1,7 +1,7 @@
 # Valstat Return Protocol C++ Definition
 Every call has a response&trade;
 
-> Together a protocol and its implementation are assembling an behavior pattern.
+Valstat protocol and its C++ definition are assembling an behavior pattern.
 
 **The C++ Code aka Implementation**
 
@@ -19,7 +19,7 @@ Is in separate repository [HERE](https://github.com/DBJDBJ/valstat_cpp_code).
 
 In case you hotly dislike this work, or if the situation is the opposite, or there is anything else you wish to communicate on the long scale in between these two extremes, please do not hesitate to contact the author:
 
-(c) 2019, 2020 by [dbj at dbj dot org](mailto:dbj@dbj.org)
+(c) 2019 - 2021 by [dbj at dbj dot org](mailto:dbj@dbj.org)
 
 #### Content of this repository is licensed under the [License DBJ](./LICENSE.md)
 
