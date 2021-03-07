@@ -1,5 +1,5 @@
 # Valstat Return Protocol C++ Definition
-Every call has a response&trade;
+Every caller has a responder&trade;
 
 Valstat protocol and its C++ definition are assembling an behavior pattern.
 
