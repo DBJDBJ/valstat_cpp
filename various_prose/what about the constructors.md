@@ -7,7 +7,6 @@
 | Potential Audience | WG21 |
 | Author           | Dusan B. Jovanovic ( [dbj@dbj.org](mailto:dbj@dbj.org) ) |
 
-<h2>&nbsp;</h2>
 
 - [1. Abstract](#1-abstract)
 - [2. Motivation](#2-motivation)
@@ -24,22 +23,20 @@
 - [4. The usage](#4-the-usage)
   - [4.1. Legacy](#41-legacy)
   - [4.2. Rule: Compiler ignores returns from Callable Constructors if T is created on the heap.](#42-rule-compiler-ignores-returns-from-callable-constructors-if-t-is-created-on-the-heap)
-  - [4.3. valstat returns two step decoding](#43-valstat-returns-two-step-decoding)
+  - [4.3. valstat two step decoding](#43-valstat-two-step-decoding)
   - [4.4. Rule: If constructor does not contain return statements, it can not be called.](#44-rule-if-constructor-does-not-contain-return-statements-it-can-not-be-called)
 - [5. Conclusion](#5-conclusion)
 - [6. Appendix: The valstat nano course](#6-appendix-the-valstat-nano-course)
 
-<h2>&nbsp;</h2>
 
 "There are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies, and the other way is to make it so complicated that there are no obvious deficiencies. The first method is far more difficult." -- [C.A.R. Hoare](https://en.wikiquote.org/wiki/C._A._R._Hoare)
 
-<h2>&nbsp;</h2>
 
 ## 1. Abstract
 
 This paper describes very simple C++callable constructors proposal, by imposing a core language change that is fundamental but in the same time non breaking.
 
-For the actual implementation the [VALSTAT](https://github.com/DBJDBJ/valstat) protocol definition is deployed.
+For the actual implementation the [VALSTAT](#6-appendix-the-valstat-nano-course) protocol definition is deployed.
 
 ## 2. Motivation
 
@@ -184,12 +181,14 @@ return person() ;
 ```
 Only explicit assignment to T::valstat will provoke callable constructors return to be passed out.  
 ```cpp
-void login ( person p);
-// resulting in a person instance
+// argument type is a person instance
 // not person::valstat
+void login ( person p);
+
 login( person() ); 
 
-// Reminder: valstat field = state + data
+// argument type is a person::valstat instance
+// valstat field = state + data
 void check ( person::valstat const & pv ) {
   // CAUTION: value might point to a temporary object
   if ( pv.value )
@@ -204,7 +203,7 @@ person * pp = new person();
 ```
 Compiler should be able to resolve the above easily.
 
-### 4.3. valstat returns two step decoding
+### 4.3. valstat two step decoding
 
 valstat structure carries information. Information = state + data.
 
@@ -236,7 +235,6 @@ if ( status ) {
 auto [ p , status ] = person("Mr Person") ;
 ```
 
-<h2>&nbsp;</h2>
 
 ## 5. Conclusion
 Can this mechanism be abused? Anything in C++ can be abused. Standard constructor paradigm can be abused. Callable constructors can be abused too.
@@ -262,5 +260,7 @@ Combination of value *and* status occupancies is giving four possible states.
 **Valstat type is the valstat carrier.**
 
 > Information = state + data
+
+Full [VALSTAT](https://github.com/DBJDBJ/valstat) document.
 
 *EOF*
