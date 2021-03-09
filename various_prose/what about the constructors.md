@@ -11,18 +11,17 @@
 - [1. Abstract](#1-abstract)
 - [2. Motivation](#2-motivation)
 - [3. Synopsis](#3-synopsis)
-  - [3.1. Rule: C Constructor return type must be nested valstat type of the same class](#31-rule-c-constructor-return-type-must-be-nested-valstat-type-of-the-same-class)
+  - [3.1. Rule: callable constructor return type must be nested valstat type of the same class](#31-rule-callable-constructor-return-type-must-be-nested-valstat-type-of-the-same-class)
   - [3.2. Rule: there can be one or more nested types following the rule 1](#32-rule-there-can-be-one-or-more-nested-types-following-the-rule-1)
-  - [3.3. Rule: C constructors have the same signature as any other non callable constructors.](#33-rule-c-constructors-have-the-same-signature-as-any-other-non-callable-constructors)
+  - [3.3. Rule: callable constructors have the same signature as any other non callable constructors.](#33-rule-callable-constructors-have-the-same-signature-as-any-other-non-callable-constructors)
   - [3.4. Rule:  Callable constructors can not be declared explicit.](#34-rule--callable-constructors-can-not-be-declared-explicit)
   - [3.5. Rule: compiler generated constructors and assignments are not callable.](#35-rule-compiler-generated-constructors-and-assignments-are-not-callable)
   - [3.6. Rule: Assignments can not be callable in any case](#36-rule-assignments-can-not-be-callable-in-any-case)
-  - [3.7. Rule: compiler deleted constructors and assignments are obviously not callable](#37-rule-compiler-deleted-constructors-and-assignments-are-obviously-not-callable)
-  - [3.8. Side effect: noexcept ctor is certain at last](#38-side-effect-noexcept-ctor-is-certain-at-last)
-  - [3.9. Callable Constructors and Unfinished instances](#39-callable-constructors-and-unfinished-instances)
+  - [3.7. Side effect: noexcept ctor is certain at last](#37-side-effect-noexcept-ctor-is-certain-at-last)
+  - [3.8. Callable Constructors and Unfinished instances](#38-callable-constructors-and-unfinished-instances)
 - [4. The usage](#4-the-usage)
   - [4.1. Legacy](#41-legacy)
-  - [4.2. Rule: Compiler ignores returns from Callable Constructors if T is created on the heap.](#42-rule-compiler-ignores-returns-from-callable-constructors-if-t-is-created-on-the-heap)
+  - [4.2. Rule: If T is created on the heap, compiler ignores returns from Callable Constructors .](#42-rule-if-t-is-created-on-the-heap-compiler-ignores-returns-from-callable-constructors-)
   - [4.3. valstat two step decoding](#43-valstat-two-step-decoding)
   - [4.4. Rule: If constructor does not contain return statements, it can not be called.](#44-rule-if-constructor-does-not-contain-return-statements-it-can-not-be-called)
 - [5. Conclusion](#5-conclusion)
@@ -58,7 +57,7 @@ Cost of this mechanism is almost zero.
 | Term          | Meaning                                         |
 | ------------- | ----------------------------------------------- |
 | C Ctor        |
-| C Constructor | Callable Constructor                            |
+| callable constructor | Callable Constructor                            |
 | CC Class      | Class having one or more Callable Constructors  |
 | CC Struct     | Struct having one or more Callable Constructors |
 
@@ -105,20 +104,20 @@ person ( person && another_ ) noexcept : name ( another_.name ) {
 struct person 
 {
 ```  
-### 3.1. Rule: C Constructor return type must be nested valstat type of the same class
+### 3.1. Rule: callable constructor return type must be nested valstat type of the same class
 value field type must be the pointer to the type being constructed. 
 ```cpp
   // T::valstat declaration
   // C Ctor has to return instance of this struct
   struct valstat { person * value; const char * status; };
 ```
-Value of the T::valstat field must no be freed. T::valstat field can point to non existent T instance.
+Value of the T::valstat field must not be freed. T::valstat field can point to non existent T instance.
 
 ### 3.2. Rule: there can be one or more nested types following the rule 1
 
-Callable `person` constructors must return `person::valstat`.
+Callable *person* constructors must return *person::valstat*.
 
-### 3.3. Rule: C constructors have the same signature as any other non callable constructors. 
+### 3.3. Rule: callable constructors have the same signature as any other non callable constructors. 
 All the other language rules for constructors do apply.
 
 If constructor has no return type in its implementation it can not be called; it is a "normal" constructor.
@@ -142,27 +141,28 @@ Callable constructors:
       return valstat{ *this, "person constructed" };
    }
 ```
-Constructor return type rules are the same rules as for any other function except that return type is not declared. As ever on standard C++ constructors
+Constructor return type rules are the same rules as for any other function except that return type is not declared. 
 ```cpp
 // destructors were always callable
 ~person () { if (! empty() ) name = ""; }
 ```
 ### 3.5. Rule: compiler generated constructors and assignments are not callable.
-### 3.6. Rule: Assignments can not be callable in any case
 ```cpp
 person & operator = ( person const & ) noexcept = default ;
 person & operator = ( person && ) noexcept = default ;
 ```
-### 3.7. Rule: compiler deleted constructors and assignments are obviously not callable
+### 3.6. Rule: Assignments can not be callable in any case
+Compiler deleted constructors and assignments are obviously not callable. 
+
 Copy or move constructor, signature is unchanged. Declarations of constructors and assignments are same as ever before.
 ```cpp    
 person ( person const & another_ ) noexcept = delete ;
 ```
-### 3.8. Side effect: noexcept ctor is certain at last
+### 3.7. Side effect: noexcept ctor is certain at last
 
 Until now noexcept constructors have been a best guess. In this scenario noexcept might be finally a true mark of no exceptions thrown. At least when callable constructors are concerned.
 
-### 3.9. Callable Constructors and Unfinished instances
+### 3.8. Callable Constructors and Unfinished instances
 
 In case of returning a valstat prematurely i.e.from an unfinished object ctor, `this` will be a nullptr. Compiler should be able to catch that as an error.
 
@@ -188,16 +188,24 @@ void login ( person p);
 login( person() ); 
 
 // argument type is a person::valstat instance
-// valstat field = state + data
 void check ( person::valstat const & pv ) {
-  // CAUTION: value might point to a temporary object
+  // value might point to a temporary object
   if ( pv.value )
    logging() << pv.value->name << " checks OK";
 }
 // constructor return passed as argument value
 check( person() ) ;
 ```
-### 4.2. Rule: Compiler ignores returns from Callable Constructors if T is created on the heap.
+Canonical valstat return from a callable constructor
+```cpp
+person::valstat pv = person();
+```
+Or
+```cpp
+auto [ value, status ]  = person();
+```
+
+### 4.2. Rule: If T is created on the heap, compiler ignores returns from Callable Constructors .
 ```cpp
 person * pp = new person();
 ```
@@ -205,9 +213,7 @@ Compiler should be able to resolve the above easily.
 
 ### 4.3. valstat two step decoding
 
-valstat structure carries information. Information = state + data.
-
-One could naturally decode the full valstat information returned as a result of a constructor call.
+valstat structure carries information. Information = state + data. One can naturally decode the full valstat information returned as a result of a constructor call.
 ```cpp
 // using the callable constructor 
 // return type is: person::valstat
@@ -244,23 +250,23 @@ This language extension would not break any existing code.
 
 ## 6. Appendix: The valstat nano course
 
-`T::valstat` is a mandated type whose instance is returned from a callable constructor of a type T.
+*T::valstat* is a mandated type whose instance is returned from a callable constructor of a type T.
 
-Instances of that type are used to "carry one the four states" as described in [VALSTAT](https://github.com/DBJDBJ/valstat/blob/master/VALSTAT.md).
+Instances of that type are used to carry the full information. One of the four states as described in [VALSTAT](https://github.com/DBJDBJ/valstat/blob/master/VALSTAT.md) and the data, if any.
 
 Combination of value *and* status occupancies is giving four possible states. 
 
-| Meta State Label | Value occupancy | op  | Status occupancy |
+| State Tag | Value  | op  | Status  |
 | ---------------- | --------------- | --- | ---------------- |
-| **Info**         | Has value       | AND | Has value        |
-| **OK**           | Has value       | AND | Empty            |
-| **Error**        | Empty           | AND | Has value        |
+| **Info**         | Occupied       | AND | Occupied        |
+| **OK**           | Occupied       | AND | Empty            |
+| **Error**        | Empty           | AND | Occupied        |
 | **Empty**        | Empty           | AND | Empty            |
 
-**Valstat type is the valstat carrier.**
-
+> Valstat type is the information carrier
+>
 > Information = state + data
 
-Full [VALSTAT](https://github.com/DBJDBJ/valstat) document.
+The link to the full [VALSTAT](https://github.com/DBJDBJ/valstat) document.
 
 *EOF*
