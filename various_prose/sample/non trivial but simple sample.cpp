@@ -79,13 +79,8 @@ std-proposals discussionimplement this with valstat
 //
 #include <optional>
 #include <vector>
-#include <string>
-
-using std::string;
+ 
 using buff_t = std::vector<char>;
-
-#undef SX
-#define SX(fmt_, x_) fprintf(stdout, "\n%s : " fmt_, #x_, (x_))
 
 /*
     const char * const msg_ = _sys_errlist[ec_] ;
@@ -233,7 +228,7 @@ valstat<GeoServer> GetOrOpenGeoServerConnection() noexcept
     return_on_no_value(VS)
 
 // return type is record of two fields aka valstat
-valstat<std::string> FindUsersCity() noexcept
+inline valstat< const char * > FindUsersCity() noexcept
 {
     call(contacts, GetOrOpenContactsServerConnection());
     call(uid, contacts.value->GetUserId());
@@ -242,7 +237,7 @@ valstat<std::string> FindUsersCity() noexcept
     call(cityname, (uloc.value)->GetCityName());
     // all the call's above do return_on_no_value
     // thus the value must exist here
-    return {{*cityname.value}, {}};
+    return { *cityname.value, {} };
 }
 
 #undef call
@@ -251,7 +246,6 @@ valstat<std::string> FindUsersCity() noexcept
 static int test_()
 {
     int id_ = 0;
-
     // loop until city is found
     do
     {
@@ -260,7 +254,7 @@ static int test_()
 
         if (city_name)
         {
-            printf("\n%s", city_name->data());
+            printf("\n%s", *city_name );
             break;
         }
 
@@ -268,8 +262,7 @@ static int test_()
             printf("\n%s", errc->data());
 
     } while (true);
-
-    return id_;
+return id_;
 }
 
 int main()
