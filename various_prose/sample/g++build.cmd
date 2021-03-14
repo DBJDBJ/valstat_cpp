@@ -14,5 +14,6 @@ and assertions disabled (-DNDEBUG).
 @SET "G++=D:\PROD\TDM-GCC-64\bin\g++.exe"
 @SET "OPT=-fno-exceptions -Wno-unused-parameter -Wall -Wextra -Wpedantic -std=c++17"
 @SET "RELEASE=-s -O3 -march=native -mtune=native -DNDEBUG=1"
+@SET "DEBUG=-O0"
 @rem
 %G++% %OPT% %RELEASE% -o "non trivial but simple sample" "non trivial but simple sample.cpp"

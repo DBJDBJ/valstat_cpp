@@ -3,6 +3,7 @@
 /*
 First problem is this page: https://docs.microsoft.com/en-us/cpp/c-language/strerror-function?view=msvc-160
 It is unclear if that applies since there is also:
+https://docs.microsoft.com/en-us/cpp/c-runtime-library/errno-doserrno-sys-errlist-and-sys-nerr?view=msvc-160
 
 const char * const msg_ = _sys_errlist[ec_] ;
 
@@ -10,8 +11,16 @@ MSVC crt error messages are in  _sys_errlist[0 .. 43]
 errno outside of that message is "Unknown Error"
 which is _sys_errlist[43]
 
-For legal errno see:
+For Windows CRT legal errno's see:
 https://docs.microsoft.com/en-us/cpp/c-runtime-library/errno-doserrno-sys-errlist-and-sys-nerr?view=msvc-160
+
+
+On WINDOWS there is only a subset of errno messages in use
+And "illegal" errno yields message: "Unknown Error" which is misleading
+thus we will return: "Not a legal Windows errno: %d"
+NOTE: if Windows SDK changes errno.h this will have to be changed
+chances of that happening are very close to zero. But still not zero.
+date of this code: 2021-03-14
 */
 
 /*
@@ -44,7 +53,6 @@ constant 1 before including string.h.
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
-#include <locale.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -55,6 +63,7 @@ extern "C"
         dbj_strerror_max_len = 1024,
         dbj_strerror_mid_len = 512,
     };
+    
     typedef struct
     {
         char data[dbj_strerror_max_len];
@@ -68,15 +77,6 @@ extern "C"
         unsigned int ec_, const char user_msg_[dbj_strerror_mid_len])
     {
         assert(strnlen_s(user_msg_, dbj_strerror_mid_len) < dbj_strerror_mid_len);
-        /*
-https://docs.microsoft.com/en-us/cpp/c-runtime-library/errno-doserrno-sys-errlist-and-sys-nerr?view=msvc-160
-on WINDOWS there is only a subset of errno messages in use
-And "illegal" errno message is "Unknown Error" which is misleading
-thus we will return: "Not a legal Windows errno: %d"
-NOTE: if Windows SDK changes errno.h this will have to be changed
-chances of that happening are very close to zero. But still not zero.
-date of this code: 2021-03-14
-*/
 #ifdef _WIN32
         bool illegal_win_errno = false;
         switch (ec_)

@@ -12,8 +12,7 @@ https://godbolt.org/z/7bn9r5
 #define WHT_MSG(S_) VT_WHITE_BRIGHT S_ VT_RESET
 
 /*
- (c) 2020 by dbj@dbj.org
- LICENSE_DBJhttps://dbj.org/license_dbj/
+ (c) 2020 by dbj@dbj.org,  https://dbj.org/license_dbj/
  valstat(tm) and metastate(tm) are protected trade marks
 
 2020 Q4, one std-proposals discussion was centered arround this use-case
@@ -42,29 +41,30 @@ https://godbolt.org/z/7bn9r5
 
 /*	199711L(until C++11) */
 #if (__cplusplus == 199711)
-#define DBJ_CPP03
+#define DBJ_CPP03 1
 #elif (__cplusplus == 201103)
-#define DBJ_CPP11
+#define DBJ_CPP11 1
 #elif (__cplusplus == 201402)
-#define DBJ_CPP14
+#define DBJ_CPP14 1
 #elif (__cplusplus == 201703)
-#define DBJ_CPP17
+#define DBJ_CPP17 1
 #elif (__cplusplus == 202002)
-#define DBJ_CPP20
+#define DBJ_CPP20 1
 #else
 #error Unsuported C++ version
 #endif
 
 #include <optional>
 
-static auto initialize_once = []() {
+inline auto initialize_once = []() noexcept
+{
     srand((unsigned)time(0));
     return true;
 }();
 
 /* the VALSTAT structure */
 template <typename T>
-struct valstat final
+struct [[nodiscard]] valstat final
 {
     std::optional<T> value;
     /* 
@@ -80,12 +80,6 @@ implementation of making the error message
 */
 
 ////////////////////////////////////////////////////////////////
-
-// here we are emulating some busines logic  API
-// using the valstat protocol
-// we will be meandering between various
-// types when composing various adhoc valstat's
-//
 // Values are inside or not inside the two valstat fields
 // For step one of decoding the valstat returned
 // the actual value is irelevant
@@ -102,6 +96,12 @@ implementation of making the error message
     return_on_empty_value(VS)
 
 ////////////////////////////////////////////////////////////
+//
+// here we are emulating some busines logic  API
+// using the valstat protocol
+// we will be meandering between various
+// types when composing various adhoc valstat's
+//
 // we emulate non-deterministic business system and logic
 // some data may be there or not there
 // random 0/1 flip-flop
@@ -113,7 +113,7 @@ struct UserId final
 };
 struct ContactsServer final
 {
-    valstat<UserId> GetUserId()
+    valstat<UserId> GetUserId() noexcept
     {
         static UserId uid_;
         // random flip OK or ERROR metastate return
@@ -123,13 +123,13 @@ struct ContactsServer final
 
         // ERROR = empty value field AND occupied status field
         // error codes are random and arbitrary
-        return {{}, dbj_strerror(EFAULT, RED_MSG("while trying to obtain user id.") ) };
+        return {{}, dbj_strerror(EFAULT, RED_MSG("while trying to obtain user id."))};
     }
 };
 
 struct Location final
 {
-    valstat<const char *> GetCityName()
+    valstat<const char *> GetCityName() noexcept
     {
         // OK = occupied value field AND empty status field
         return {"Valhala", {}};
@@ -138,7 +138,7 @@ struct Location final
 
 struct GeoServer final
 {
-    valstat<Location> GetLocation(UserId *uid)
+    valstat<Location> GetLocation(UserId *uid) noexcept
     {
         static Location loc_;
         if (RANDOM_0_OR_1)
@@ -148,7 +148,8 @@ struct GeoServer final
     }
 };
 
-valstat<ContactsServer> GetOrOpenContactsServerConnection() noexcept
+inline valstat<ContactsServer>
+GetOrOpenContactsServerConnection() noexcept
 {
     static ContactsServer cs{};
     if (RANDOM_0_OR_1)
@@ -157,7 +158,8 @@ valstat<ContactsServer> GetOrOpenContactsServerConnection() noexcept
     return {{}, dbj_strerror(EINVAL, RED_MSG("while trying to get or open the server connection"))};
 }
 
-valstat<GeoServer> GetOrOpenGeoServerConnection() noexcept
+inline valstat<GeoServer>
+GetOrOpenGeoServerConnection() noexcept
 {
     static GeoServer gs_;
     if (RANDOM_0_OR_1)
@@ -181,9 +183,6 @@ inline valstat<const char *> FindUsersCity() noexcept
     // thus the value field must be "occupied" here
     return {*cityname.value, {}};
 }
-
-#undef vscall
-#undef return_on_empty_value
 
 static int test_()
 {
@@ -226,9 +225,19 @@ int main()
     printf("\n" WHT_MSG("---------------------------------"));
 }
 
+
+#undef vscall
+#undef return_on_empty_value
+
+#undef VT_WHITE_BRIGHT
+#undef VT_RED_BRIGHT
+#undef VT_RESET
+#undef RED_MSG
+#undef WHT_MSG
+
 /*
-    VALSTAT for above but inside tight runtimes
-    depends on two facts:
+    VALSTAT variant for above but inside 
+    tight runtimes depends on two facts:
 
     if(!value) yields true for value == null
     if(!status) yields true if status == 0
