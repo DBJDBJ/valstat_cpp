@@ -2,22 +2,19 @@
 #define DBJ_STERROR_INC_
 /*
 First problem is this page: https://docs.microsoft.com/en-us/cpp/c-language/strerror-function?view=msvc-160
-It is unclear if that applies since there is also:
-https://docs.microsoft.com/en-us/cpp/c-runtime-library/errno-doserrno-sys-errlist-and-sys-nerr?view=msvc-160
 
 const char * const msg_ = _sys_errlist[ec_] ;
 
 MSVC crt error messages are in  _sys_errlist[0 .. 43]
 errno outside of that message is "Unknown Error"
-which is _sys_errlist[43]
+which is at _sys_errlist[43]
 
-For Windows CRT legal errno's see:
+It is unclear if that applies since there is also:
 https://docs.microsoft.com/en-us/cpp/c-runtime-library/errno-doserrno-sys-errlist-and-sys-nerr?view=msvc-160
 
 
-On WINDOWS there is only a subset of errno messages in use
-And "illegal" errno yields message: "Unknown Error" which is misleading
-thus we will return: "Not a legal Windows errno: %d"
+Nessage: "Unknown Error" is misleading
+Thus we will return: "Not a legal Windows errno: %d"
 NOTE: if Windows SDK changes errno.h this will have to be changed
 chances of that happening are very close to zero. But still not zero.
 date of this code: 2021-03-14
