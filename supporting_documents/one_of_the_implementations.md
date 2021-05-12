@@ -204,13 +204,13 @@ For example, [] opearator returning valstat delivers a simple solution "for bad 
 
 ```cpp
 namespace dbj {
-        // simple arrays that does not throw exceptions
+        // simple array of chars that does not throw exceptions
 	template< size_t N>	struct arry final
 	{
 	array<char, N> buff_{ };
 
 	// valstat return does not require
-	// exception thinking fame of mind
+	// exceptions based thinking
 	dbj::valstat<char> operator [] (size_t idx_) const noexcept
 	{
 		if (idx_ >= buff_.size())
