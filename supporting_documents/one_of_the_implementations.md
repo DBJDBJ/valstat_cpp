@@ -226,17 +226,17 @@ The usage. In normal, index within bounds, situations, `val` is used as ever bef
 ```cpp
 arry<0xFF> xarr{{"0123456ABCDEFGH"}};
 // OK
-auto [val, stat] = charr[7];
+auto [val, stat] = xarr[7];
 // 7 is ok index, no error state
 if (val) cout << *val ;
 ```
-Bad index, is easily  reported, and application proceeds.
+Bad index, is easily spoted and reported, and application proceeds.
 ```cpp
-// ERROR state return
-auto [val, stat] = charr[42];
+// ERROR valstat state return
+auto [val, stat] = xarr[42];
 if (stat) cout << stat ;
 ```
-What also matters here is local handling of error state. In this particular case we are not pushed all of a sudden, and far away, to where some "bad index" exception might be caught. Provided we know where is that location.
+What greatly matters here is local handling of error state. In this particular case we are not pushed all of a sudden and far away, to where some "bad index" exception might be caught. Provided we know where is that location, and it is in the code we can manage.
 
 Using valstat, users simply and locally handle the error situation. And then proceed in sync with the application logic.
 
