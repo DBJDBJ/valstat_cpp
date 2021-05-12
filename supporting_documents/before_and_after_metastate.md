@@ -1,3 +1,5 @@
+Colophon: Legacy valstat paradigm was called: "metastate". There was no separate valstat protocol.
+
 # valstat use-cases<!-- omit in toc -->
 
 ## Contents<!-- omit in toc -->
