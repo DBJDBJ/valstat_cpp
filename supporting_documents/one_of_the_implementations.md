@@ -264,8 +264,6 @@ Types returned are API specific. In case of the dbj company, status is always a 
 
 **valstat** is a familiar concept. Its value raises with its  ubiquity. 
 
-#### Ubiquity requires interoperability.
+#### Ubiquity thrivea on interoperability.
 
-Let's start with C interoperability.
 
-### [One of the possible C interops](./one_of_the_possible_C_interops.md)
