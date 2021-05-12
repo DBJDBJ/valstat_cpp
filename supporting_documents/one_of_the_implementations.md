@@ -1,9 +1,9 @@
 #  valstat&trade;
-## Implementation matters, concept is the key
+## Implementation matters, idea is the key
 
-Same as its concept, architecture and design, **valstat** implementation must be simple, resilient and feasible. And performant. 
+Same as its core idea, architecture and design, **valstat** implementation must be simple, resilient and feasible. And performant. 
 
-There are many possible valstat implementations. Each conforming to the concept and architecture. But also developed inside the scope of the particular project. Here are the just a few.
+There can be many possible valstat implementations, in parallel existence. Each conforming to the same core idea and architecture. But also developed inside the scopes of many separate projects. Here are the just a few.
 
 #### Most Restricted Run-Time
 
