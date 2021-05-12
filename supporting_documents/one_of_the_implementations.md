@@ -1,4 +1,4 @@
-#  valstat
+#  valstat&trade;
 ## Implementation matters, concept is the key
 
 Same as its concept, architecture and design, **valstat** implementation must be simple, resilient and feasible. And performant. 
